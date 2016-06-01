@@ -1,8 +1,9 @@
 'use strict';
 
-var isPromise = require('is-promise');
-
 function register(callback) {
+  if (typeof callback !== 'function') {
+      postOutgoingMessage(messageId, new Error(
+        'Please pass a function into register().'));}
 
   function postOutgoingMessage(messageId, error, result) {
     if (error) {
@@ -51,15 +52,12 @@ function register(callback) {
     var messageId = payload[0];
     var message = payload[1];
 
-    if (typeof callback !== 'function') {
-      postOutgoingMessage(messageId, new Error(
-        'Please pass a function into register().'));
-    } else {
+    
       handleIncomingMessage(callback, messageId, message);
-    }
+    
   }
 
   self.addEventListener('message', onIncomingMessage);
 }
 
-module.exports = register;
+export default { register };
