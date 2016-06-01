@@ -12,8 +12,8 @@ class PromiseWorker extends Worker {
    * @param {DOMString} file - url to worker script
    */
   constructor(file) {
-    this._callbacks = new Map();
     super(file);
+    this._callbacks = new Map();
 
     this.addEventListener('message', e => {
       let [messageId, error, result] = JSON.parse(e.data);
