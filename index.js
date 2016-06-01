@@ -23,19 +23,13 @@ class PromiseWorker extends Worker {
   }
   
   postMessage(userMessage) {
-    var self = this;
-    var messageId = messageIds++;
-
-    var messageToSend = [messageId, userMessage];
-
-    return new MyPromise(function (resolve, reject) {
-      self._callbacks[messageId] = function (error, result) {
-        if (error) {
-          return reject(new Error(error.message));
-        }
+    let messageId = messageIds++;
+    return new Promise((resolve, reject) => {
+      this._callbacks.set(messageId, (error, result) => {
+        if (error) return reject(new Error(error));
         resolve(result);
-      };
-      self._worker.postMessage(JSON.stringify(messageToSend));
+      })
+      super.postMessage(JSON.stringify([messageId, userMessage]));
     });
-    }
+  }
 }
