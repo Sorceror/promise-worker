@@ -27,7 +27,6 @@ function register(callback) {
       .catch(error => {
         postOutgoingMessage(messageId, error);
       })
-      .then(result => Promise.resolve(result))
       .then(finalResult => {
         postOutgoingMessage(messageId, null, finalResult);
       }).catch(finalError => {
