@@ -1,32 +1,23 @@
-promise-worker [![Build Status](https://travis-ci.org/nolanlawson/promise-worker.svg?branch=master)](https://travis-ci.org/nolanlawson/promise-worker) [![Coverage Status](https://coveralls.io/repos/github/nolanlawson/promise-worker/badge.svg?branch=master)](https://coveralls.io/github/nolanlawson/promise-worker?branch=master)
+promise-worker
 ====
 
-Small and performant API for communicating with Web Workers using Promises.
+Small and performant API for communicating with Web Workers using Promises. 
 
-**Goals:**
-
- * Tiny footprint (~2.5kB min+gz)
- * Assumes you have a separate `worker.js` file (easier to debug, better browser support)
- * `JSON.stringify`s messages [for performance](http://nolanlawson.com/2016/02/29/high-performance-web-worker-messages/)
+This fork simplfies the code a little by using ES6 (arrow functions, destructing), and extends Worker rather than taking an existing worker as a parameter. It also assumes that Promise and Worker are already present.
 
 Usage
 ---
-
-Install:
-
-    npm install promise-worker
 
 Inside your main bundle:
 
 ```js
 // main.js
-var PromiseWorker = require('promise-worker');
-var worker = new Worker('worker.js');
-var promiseWorker = new PromiseWorker(worker);
+import PromiseWorker from 'promise-worker';
+let promiseWorker = new PromiseWorker('worker.js');
 
-promiseWorker.postMessage('ping').then(function (response) {
+promiseWorker.postMessage('ping').then(response => {
   // handle response
-}).catch(function (error) {
+}).catch(error => {
   // handle error
 });
 ```
@@ -35,14 +26,14 @@ Inside your `worker.js` bundle:
 
 ```js
 // worker.js
-var register = require('promise-worker/register');
+import register from 'promise-worker/register';
 
-register(function (message) {
+register(message => {
   return 'pong';
 });
 ```
 
-Note that you `require()` two separate APIs, so the library is split
+Note that you `import` two separate APIs, so the library is split
 between the `worker.js` and main file. This keeps the total bundle size smaller.
 
 ### Message format
@@ -60,7 +51,7 @@ promiseWorker.postMessage({
 
 ```js
 // worker.js
-register(function (message) {
+register(message => {
   console.log(message); // { hello: 'world', answer: 42, 'this is fun': true }
 });
 ```
@@ -74,16 +65,14 @@ Inside of the worker, the registered handler can return either a Promise or a no
 
 ```js
 // worker.js
-register(function () {
-  return Promise.resolve().then(function () {
-    return 'much async, very promise';
-  });
+register(() => {
+  return Promise.resolve().then(() => 'much async, very promise'});
 });
 ```
 
 ```js
 // main.js
-promiseWorker.postMessage(null).then(function (message) {
+promiseWorker.postMessage(null).then(message => {
   console.log(message): // 'much async, very promise'
 });
 ```
@@ -98,15 +87,15 @@ be propagated to the main thread as a rejected Promise. For instance:
 
 ```js
 // worker.js
-register(function (message) {
+register(message => {
   throw new Error('naughty!');
 });
 ```
 
 ```js
 // main.js
-promiseWorker.postMessage('whoops').catch(function (err) {
-  console.log(err.message); // 'naughty!'
+promiseWorker.postMessage('whoops').catch(err => {
+  console.log(err); // 'naughty!'
 });
 ```
 
@@ -132,7 +121,7 @@ promiseWorker.postMessage({
 
 ```js
 // worker.js
-register(function (message) {
+register(message => {
   if (message.type === 'en') {
     return 'Hello!';
   } else if (message.type === 'fr') {
@@ -141,35 +130,14 @@ register(function (message) {
 });
 ```
 
-Browser support
-----
-
-See [.zuul.yml](https://github.com/nolanlawson/promise-worker/blob/master/.zuul.yml) for the full list
-of tested browsers, but basically:
-
-* Chrome
-* Firefox
-* Safari 7+
-* IE 10+
-* Edge
-* iOS 8+
-* Android 4.4+
-
-If a browser [doesn't support Web Workers](http://caniuse.com/webworker) but you still want to use this library,
-then you can use [PseudoWorker](https://github.com/nolanlawson/pseudo-worker).
-
-This library is not designed to run in Node.
-
 API
 ---
 
 ### Main bundle
 
-#### `new PromiseWorker(worker)`
+#### `new PromiseWorker(url)`
 
-Create a new `PromiseWorker`, using the given worker.
-
-* `worker` - the `Worker` or [PseudoWorker](https://github.com/nolanlawson/pseudo-worker) to use.
+Create a new `PromiseWorker`, using the given URL. PromiseWorker extends `Worker`, so methods like `promiseWorker.terminate()` still work as intended. However, you can't use transferrables as the messages are still stringified.
 
 #### `PromiseWorker.postMessage(message)`
 
