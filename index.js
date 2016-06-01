@@ -11,7 +11,6 @@ class PromiseWorker extends Worker {
       let [messageId, error, result] = JSON.parse(e.data);
 
       let callback = this._callbacks.get(messageId);
-
       if (!callback) {
         // Ignore - user might have created multiple PromiseWorkers.
         // This message is not for us.
@@ -22,21 +21,21 @@ class PromiseWorker extends Worker {
       callback(error, result);
     }); 
   }
-}
+  
+  postMessage(userMessage) {
+    var self = this;
+    var messageId = messageIds++;
 
-PromiseWorker.prototype.postMessage = function (userMessage) {
-  var self = this;
-  var messageId = messageIds++;
+    var messageToSend = [messageId, userMessage];
 
-  var messageToSend = [messageId, userMessage];
-
-  return new MyPromise(function (resolve, reject) {
-    self._callbacks[messageId] = function (error, result) {
-      if (error) {
-        return reject(new Error(error.message));
-      }
-      resolve(result);
-    };
-    self._worker.postMessage(JSON.stringify(messageToSend));
-  });
+    return new MyPromise(function (resolve, reject) {
+      self._callbacks[messageId] = function (error, result) {
+        if (error) {
+          return reject(new Error(error.message));
+        }
+        resolve(result);
+      };
+      self._worker.postMessage(JSON.stringify(messageToSend));
+    });
+    }
 }
