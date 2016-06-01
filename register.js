@@ -46,18 +46,11 @@ function register(callback) {
       });
     }
   }
-
-  function onIncomingMessage(e) {
-    var payload = JSON.parse(e.data);
-    var messageId = payload[0];
-    var message = payload[1];
-
-    
-      handleIncomingMessage(callback, messageId, message);
-    
-  }
-
-  self.addEventListener('message', onIncomingMessage);
+  
+  self.addEventListener('message', e => {
+    let [messageId, message] = JSON.parse(e.data);
+    handleIncomingMessage(callback, messageId, message);
+  });
 }
 
 export default { register };
