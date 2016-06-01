@@ -31,20 +31,21 @@ function register(callback) {
   }
 
   function handleIncomingMessage(callback, messageId, message) {
-
-    var result = tryCatchFunc(callback, message);
-
-    if (result.err) {
-      postOutgoingMessage(messageId, result.err);
-    } else if (!isPromise(result.res)) {
-      postOutgoingMessage(messageId, null, result.res);
-    } else {
-      result.res.then(function (finalResult) {
-        postOutgoingMessage(messageId, null, finalResult);
-      }, function (finalError) {
-        postOutgoingMessage(messageId, finalError);
-      });
-    }
+    Promise.resolve().then(() => callback(message))
+      .catch(error => {
+        postOutgoingMessage(messageId, error);
+      })
+      .then(result => {
+        if (!isPromise(result.res)) {
+          postOutgoingMessage(messageId, null, result.res);
+        } else {
+          result.res.then(function (finalResult) {
+            postOutgoingMessage(messageId, null, finalResult);
+          }, function (finalError) {
+            postOutgoingMessage(messageId, finalError);
+          });
+        }
+      })
   }
   
   self.addEventListener('message', e => {
