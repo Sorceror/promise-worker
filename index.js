@@ -5,14 +5,18 @@ var messageIds = 0; //incrementor for IDs
 /**
  * A Web Worker that returns a promise when calling postMessage.
  * Additionally stringifies messages for performance
- * @extends Worker
  */
-export default class PromiseWorker extends Worker {
+export default class PromiseWorker {
   /**
    * @param {DOMString} file - url to worker script
    */
   constructor(file) {
-    super(file);
+    if (file instanceof Worker) {
+      this._worker = file;
+    } else {
+      this._worker = new Worker(file);
+    }
+    
     this._callbacks = new Map();
 
     this.addEventListener('message', e => {
@@ -43,7 +47,7 @@ export default class PromiseWorker extends Worker {
         if (error) return reject(new Error(error));
         resolve(result);
       })
-      super.postMessage(JSON.stringify([messageId, userMessage]));
+      this._worker.postMessage(JSON.stringify([messageId, userMessage]));
     });
   }
 }
