@@ -1,32 +1,28 @@
 'use strict';
 
-/* istanbul ignore next */
-var MyPromise = typeof Promise !== 'undefined' ? Promise : require('lie');
-
 var messageIds = 0;
 
-function PromiseWorker(worker) {
-  var self = this;
-  self._worker = worker;
-  self._callbacks = {};
+class PromiseWorker extends Worker {
+  constructor(file) {
+    var self = this;
+    super(file)
+    self._callbacks = {};
 
-  worker.addEventListener('message', function onIncomingMessage(e) {
-    var message = JSON.parse(e.data);
-    var messageId = message[0];
-    var error = message[1];
-    var result = message[2];
+    this.addEventListener('message', function onIncomingMessage(e) {
+      let [messageId, error, result] = JSON.parse(e.data);
 
-    var callback = self._callbacks[messageId];
+      var callback = self._callbacks[messageId];
 
-    if (!callback) {
-      // Ignore - user might have created multiple PromiseWorkers.
-      // This message is not for us.
-      return;
-    }
+      if (!callback) {
+        // Ignore - user might have created multiple PromiseWorkers.
+        // This message is not for us.
+        return;
+      }
 
-    delete self._callbacks[messageId];
-    callback(error, result);
-  });
+      delete self._callbacks[messageId];
+      callback(error, result);
+    }); 
+  }
 }
 
 PromiseWorker.prototype.postMessage = function (userMessage) {
@@ -44,6 +40,4 @@ PromiseWorker.prototype.postMessage = function (userMessage) {
     };
     self._worker.postMessage(JSON.stringify(messageToSend));
   });
-};
-
-module.exports = PromiseWorker;
+}
