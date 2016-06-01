@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * Calls the function passed whenever a message is posted to 
+ * the web worker. 
+ * @param {function} callback - handles the message
+ * @listens Worker~message 
+ */
 function register(callback) {
   if (typeof callback !== 'function') {
       postOutgoingMessage(messageId, new Error(
@@ -15,7 +21,8 @@ function register(callback) {
     self.postMessage(JSON.stringify([messageId, error, result]))
   }
 
-  function handleIncomingMessage(callback, messageId, message) {
+  self.addEventListener('message', e => {
+    let [messageId, message] = JSON.parse(e.data);
     Promise.resolve().then(() => callback(message))
       .catch(error => {
         postOutgoingMessage(messageId, error);
@@ -25,11 +32,6 @@ function register(callback) {
       }).catch(finalError => {
         postOutgoingMessage(messageId, finalError);
       })
-  }
-  
-  self.addEventListener('message', e => {
-    let [messageId, message] = JSON.parse(e.data);
-    handleIncomingMessage(callback, messageId, message);
   });
 }
 
