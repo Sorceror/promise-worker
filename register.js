@@ -6,20 +6,13 @@ function register(callback) {
         'Please pass a function into register().'));}
 
   function postOutgoingMessage(messageId, error, result) {
-    if (error) {
-      /* istanbul ignore else */
-      if (typeof console !== 'undefined' && 'error' in console) {
-        // This is to make errors easier to debug. I think it's important
-        // enough to just leave here without giving the user an option
-        // to silence it.
-        console.error('Worker caught an error:', error);
-      }
-      self.postMessage(JSON.stringify([messageId, {
-        message: error.message
-      }]));
-    } else {
-      self.postMessage(JSON.stringify([messageId, null, result]));
-    }
+    if (error && self.console && console.error) {
+      // This is to make errors easier to debug. I think it's important
+      // enough to just leave here without giving the user an option
+      // to silence it.
+      console.error('Worker caught an error:', error);
+    } 
+    self.postMessage(JSON.stringify([messageId, error, result]))
   }
 
   function handleIncomingMessage(callback, messageId, message) {
