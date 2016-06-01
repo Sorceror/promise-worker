@@ -1,6 +1,6 @@
 {
   "name": "promise-worker",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Communicate with a Web Worker using Promises",
   "main": "index.js",
   "scripts": {
@@ -51,10 +51,6 @@
     "run-scripts": "^0.4.0",
     "stream-to-promise": "^1.1.0",
     "zuul": "^3.10.1"
-  },
-  "dependencies": {
-    "is-promise": "^2.1.0",
-    "lie": "^3.0.2"
   },
   "files": [
     "index.js",
