@@ -7,7 +7,7 @@ var messageIds = 0; //incrementor for IDs
  * Additionally stringifies messages for performance
  * @extends Worker
  */
-class PromiseWorker extends Worker {
+export default class PromiseWorker extends Worker {
   /**
    * @param {DOMString} file - url to worker script
    */
@@ -47,5 +47,3 @@ class PromiseWorker extends Worker {
     });
   }
 }
-
-export default { PromiseWorker };
