@@ -22,14 +22,6 @@ function register(callback) {
     }
   }
 
-  function tryCatchFunc(callback, message) {
-    try {
-      return {res: callback(message)};
-    } catch (e) {
-      return {err: e};
-    }
-  }
-
   function handleIncomingMessage(callback, messageId, message) {
     Promise.resolve().then(() => callback(message))
       .catch(error => {
