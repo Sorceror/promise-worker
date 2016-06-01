@@ -27,16 +27,11 @@ function register(callback) {
       .catch(error => {
         postOutgoingMessage(messageId, error);
       })
-      .then(result => {
-        if (!isPromise(result.res)) {
-          postOutgoingMessage(messageId, null, result.res);
-        } else {
-          result.res.then(function (finalResult) {
-            postOutgoingMessage(messageId, null, finalResult);
-          }, function (finalError) {
-            postOutgoingMessage(messageId, finalError);
-          });
-        }
+      .then(result => Promise.resolve(result))
+      .then(finalResult => {
+        postOutgoingMessage(messageId, null, finalResult);
+      }).catch(finalError => {
+        postOutgoingMessage(messageId, finalError);
       })
   }
   
