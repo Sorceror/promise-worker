@@ -4,14 +4,13 @@ var messageIds = 0;
 
 class PromiseWorker extends Worker {
   constructor(file) {
-    var self = this;
-    super(file)
-    self._callbacks = {};
+    this._callbacks = new Map();
+    super(file);
 
-    this.addEventListener('message', function onIncomingMessage(e) {
+    this.addEventListener('message', e => {
       let [messageId, error, result] = JSON.parse(e.data);
 
-      var callback = self._callbacks[messageId];
+      let callback = this._callbacks.get(messageId);
 
       if (!callback) {
         // Ignore - user might have created multiple PromiseWorkers.
@@ -19,7 +18,7 @@ class PromiseWorker extends Worker {
         return;
       }
 
-      delete self._callbacks[messageId];
+      this._callbacks.delete(messageId);
       callback(error, result);
     }); 
   }
