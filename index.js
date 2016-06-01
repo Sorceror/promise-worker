@@ -1,8 +1,16 @@
 'use strict';
 
-var messageIds = 0;
+var messageIds = 0; //incrementor for IDs
 
+/**
+ * A Web Worker that returns a promise when calling postMessage.
+ * Additionally stringifies messages for performance
+ * @extends Worker
+ */
 class PromiseWorker extends Worker {
+  /**
+   * @param {DOMString} file - url to worker script
+   */
   constructor(file) {
     this._callbacks = new Map();
     super(file);
@@ -22,6 +30,12 @@ class PromiseWorker extends Worker {
     }); 
   }
   
+  /**
+   * Stringifies and sends a given message, returning a promise that
+   * resolves when the worker finishes.
+   * @param {Object} userMessage - object to deliver to the worker.
+   * @returns {Promise<Object>}
+   */
   postMessage(userMessage) {
     let messageId = messageIds++;
     return new Promise((resolve, reject) => {
