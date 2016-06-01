@@ -8,7 +8,7 @@ var messageIds = 0; //incrementor for IDs
  */
 export default class PromiseWorker {
   /**
-   * @param {DOMString} file - url to worker script
+   * @param {DOMString|Worker} file - url to worker script
    */
   constructor(file) {
     if (file instanceof Worker) {

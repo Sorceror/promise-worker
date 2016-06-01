@@ -3,7 +3,7 @@ promise-worker
 
 Small and performant API for communicating with Web Workers using Promises. 
 
-This fork simplfies the code a little by using ES6 (arrow functions, destructing), and extends Worker rather than taking an existing worker as a parameter. It also assumes that Promise and Worker are already present.
+This fork simplfies the code a little by using ES6 (arrow functions, destructing), and also allows you to pass a url string instead of a worker if desired. It also assumes that Promise and Worker are already present.
 
 Usage
 ---
@@ -13,7 +13,8 @@ Inside your main bundle:
 ```js
 // main.js
 import PromiseWorker from 'promise-worker';
-let promiseWorker = new PromiseWorker('worker.js');
+let worker = new Worker('worker.js');
+let promiseWorker = new PromiseWorker(worker);
 
 promiseWorker.postMessage('ping').then(response => {
   // handle response
@@ -31,6 +32,14 @@ import register from 'promise-worker/register';
 register(message => {
   return 'pong';
 });
+```
+
+You can also just directly pass your worker URL without creating a worker
+
+```js
+// main.js
+import PromiseWorker from 'promise-worker';
+let promiseWorker = new PromiseWorker('worker.js');
 ```
 
 Note that you `import` two separate APIs, so the library is split
