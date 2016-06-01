@@ -33,3 +33,5 @@ class PromiseWorker extends Worker {
     });
   }
 }
+
+export default { PromiseWorker };
