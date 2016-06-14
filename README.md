@@ -13,8 +13,7 @@ Inside your main bundle:
 ```js
 // main.js
 import PromiseWorker from 'promise-worker';
-let worker = new Worker('worker.js');
-let promiseWorker = new PromiseWorker(worker);
+let promiseWorker = new PromiseWorker('worker.js');
 
 promiseWorker.postMessage('ping').then(response => {
   // handle response
@@ -27,19 +26,21 @@ Inside your `worker.js` bundle:
 
 ```js
 // worker.js
-import register from 'promise-worker/register';
+import {register} from 'promise-worker';
+//OR import register from 'promise-worker/register';
 
 register(message => {
   return 'pong';
 });
 ```
 
-You can also just directly pass your worker URL without creating a worker
+You can also choose to pass in an existing worker instead
 
 ```js
 // main.js
 import PromiseWorker from 'promise-worker';
-let promiseWorker = new PromiseWorker('worker.js');
+let worker = new Worker('worker.js');
+let promiseWorker = new PromiseWorker(worker);
 ```
 
 Note that you `import` two separate APIs, so the library is split
@@ -109,8 +110,7 @@ promiseWorker.postMessage('whoops').catch(err => {
 ```
 
 Note that stacktraces cannot be sent from the worker to the main thread, so you
-will have to debug those errors yourself. This library does however, print
-message to `console.error()`, so you should see them there.
+will have to debug those errors yourself. 
 
 ### Multi-type messages
 
@@ -146,7 +146,7 @@ API
 
 #### `new PromiseWorker(url)`
 
-Create a new `PromiseWorker`, using the given URL. PromiseWorker extends `Worker`, so methods like `promiseWorker.terminate()` still work as intended. However, you can't use transferrables as the messages are still stringified.
+Create a new `PromiseWorker`, using the given URL or Worker.
 
 #### `PromiseWorker.postMessage(message)`
 
