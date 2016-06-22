@@ -7,7 +7,7 @@
  */
 export default function register(callback) {
 	self.addEventListener('message', e => {
-		let [messageId, message] = JSON.parse(e.data);
+		const [messageId, message] = JSON.parse(e.data);
 		
 		if (typeof callback !== 'function') {
 			postOutgoingMessage(messageId, 'Please pass a function into register().');

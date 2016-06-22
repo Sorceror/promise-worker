@@ -24,9 +24,9 @@ export default class PromiseWorker {
      * calls the callback with the corresponding ID.
      */
     this.addEventListener('message', e => {
-      let [messageId, error, result] = JSON.parse(e.data);
+      const [messageId, error, result] = JSON.parse(e.data);
 
-      let callback = this._callbacks.get(messageId);
+      const callback = this._callbacks.get(messageId);
       // Ignore - user might have created multiple PromiseWorkers.
       // This message is not for us.
       if (!callback) return;
@@ -43,7 +43,7 @@ export default class PromiseWorker {
    * @returns {Promise<Object>}
    */
   postMessage(userMessage) {
-    let messageId = messageIds++;
+    const messageId = messageIds++;
     return new Promise((resolve, reject) => {
       this._callbacks.set(messageId, (error, result) => {
         if (error) return reject(new Error(error));
